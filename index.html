@@ -1,0 +1,3168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard CRUD - QA Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Solid Colors - No Gradients */
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ea580c;
+            --info: #0891b2;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            /* Design System */
+            --sidebar-width: 280px;
+            --header-height: 64px;
+            --transition: all 0.2s ease;
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --radius: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+        }
+
+        [data-theme="dark"] {
+            --white: #1f2937;
+            --gray-50: #111827;
+            --gray-100: #1f2937;
+            --gray-200: #374151;
+            --gray-300: #4b5563;
+            --gray-400: #6b7280;
+            --gray-500: #9ca3af;
+            --gray-600: #d1d5db;
+            --gray-700: #e5e7eb;
+            --gray-800: #f3f4f6;
+            --gray-900: #f9fafb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            color: var(--gray-900);
+            background: var(--gray-50);
+            transition: var(--transition);
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-6);
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .logo i {
+            margin-right: var(--space-2);
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background: var(--white);
+            border-right: 1px solid var(--gray-200);
+            padding: var(--space-6);
+            overflow-y: auto;
+            transition: var(--transition);
+            z-index: 50;
+        }
+
+        .sidebar-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .sidebar-title {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-list {
+            list-style: none;
+        }
+
+        .table-item {
+            padding: var(--space-3);
+            margin-bottom: var(--space-1);
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary);
+            transform: translateX(-100%);
+            transition: var(--transition);
+        }
+
+        .table-item:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-200);
+            transform: translateX(3px);
+        }
+
+        .table-item:hover::before {
+            transform: translateX(0);
+        }
+
+        .table-item.active {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateX(3px);
+        }
+
+        .table-item.active::before {
+            transform: translateX(0);
+        }
+
+        .table-badge {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            font-size: var(--text-xs);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .table-item.active .table-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: var(--space-6);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .content-title {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .content-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        /* Buttons - Enhanced */
+        .btn {
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--gray-700);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border-color: var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+            border-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-sm {
+            padding: var(--space-1) var(--space-3);
+            font-size: var(--text-xs);
+        }
+
+        .btn-icon {
+            padding: var(--space-2);
+            width: 36px;
+            height: 36px;
+            justify-content: center;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            margin-bottom: var(--space-6);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .card-body {
+            padding: var(--space-5);
+        }
+
+        /* Data Table */
+        .data-table-container {
+            overflow-x: auto;
+            margin-top: var(--space-4);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+        }
+
+        .data-table th {
+            background: var(--gray-50);
+            padding: var(--space-3);
+            text-align: left;
+            font-weight: 600;
+            font-size: var(--text-sm);
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table th:hover {
+            background: var(--gray-100);
+        }
+
+        .sort-icon {
+            position: absolute;
+            right: var(--space-2);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: var(--text-xs);
+        }
+
+        .sort-icon.active {
+            color: var(--primary);
+        }
+
+        .data-table td {
+            padding: var(--space-3);
+            border-bottom: 1px solid var(--gray-100);
+            font-size: var(--text-sm);
+            color: var(--gray-700);
+        }
+
+        .data-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: var(--space-1);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .action-btn.edit:hover {
+            color: var(--primary);
+        }
+
+        .action-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        /* Search and Filter */
+        .search-filter-container {
+            display: flex;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-2) var(--space-3) var(--space-2) 2.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            background: var(--white);
+            color: var(--gray-900);
+            font-size: var(--text-sm);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
+        }
+
+        .page-btn {
+            padding: var(--space-1) var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            background: var(--white);
+            color: var(--gray-700);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            transition: var(--transition);
+        }
+
+        .page-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: var(--text-sm);
+            color: var(--gray-600);
+        }
+
+        /* Enhanced Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 900px;
+            max-height: 95vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(30px);
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%);
+        }
+
+        .modal-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--text-xl);
+            color: var(--gray-400);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: var(--space-6);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: var(--space-4) var(--space-6);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-2);
+            background: var(--gray-50);
+        }
+
+        /* Enhanced Table Builder */
+        .table-builder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+        }
+
+        .builder-section {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .builder-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .builder-section:hover::before {
+            transform: scaleX(1);
+        }
+
+        .builder-section:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .builder-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .builder-title i {
+            color: var(--primary);
+        }
+
+        /* Enhanced Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+        }
+
+        .template-card {
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary);
+            transform: translateY(100%);
+            transition: var(--transition-smooth);
+        }
+
+        .template-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .template-card:hover::before {
+            transform: translateY(0);
+        }
+
+        .template-card:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        .template-card:hover .template-icon,
+        .template-card:hover .template-name {
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .template-card.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .template-icon {
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-2);
+            transition: var(--transition);
+        }
+
+        .template-card.selected .template-icon {
+            color: var(--white);
+        }
+
+        .template-name {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        /* Enhanced Column Builder */
+        .columns-builder {
+            margin-top: var(--space-6);
+        }
+
+        .column-type-selector-wrapper {
+            margin-bottom: var(--space-4);
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .column-type-selector-wrapper.active {
+            opacity: 1;
+            max-height: 300px;
+            margin-bottom: var(--space-4);
+        }
+
+        .column-type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+            padding: 0 var(--space-4);
+        }
+
+        .column-type-title {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .close-type-selector {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: var(--text-lg);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .close-type-selector:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .column-type-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-2);
+            padding: var(--space-4);
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        .type-option {
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: var(--text-xs);
+            background: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .type-option::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .type-option:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .type-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .type-option:hover i,
+        .type-option:hover span {
+            position: relative;
+            z-index: 1;
+            color: var(--white);
+        }
+
+        .type-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .type-option i {
+            display: block;
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-1);
+            transition: var(--transition);
+        }
+
+        .column-item {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin-bottom: var(--space-3);
+            transition: var(--transition);
+            position: relative;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .column-item:hover {
+            border-color: var(--gray-300);
+            box-shadow: var(--shadow);
+            transform: translateX(4px);
+        }
+
+        .column-item.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+        }
+
+        .column-type-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-text { background: var(--gray-100); color: var(--gray-700); }
+        .type-number { background: #fef3c7; color: #92400e; }
+        .type-date { background: #d1fae5; color: #065f46; }
+        .type-email { background: #dbeafe; color: #1e40af; }
+        .type-url { background: #fce7f3; color: #9f1239; }
+        .type-select { background: #e0e7ff; color: #3730a3; }
+        .type-checkbox { background: #f3e8ff; color: #6b21a8; }
+        .type-calc { background: #fed7aa; color: #9a3412; }
+
+        .column-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3);
+            margin-bottom: var(--space-3);
+        }
+
+        .column-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-actions {
+            display: flex;
+            gap: var(--space-1);
+        }
+
+        .column-action-btn {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .column-action-btn:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            transform: scale(1.1);
+        }
+
+        .column-action-btn.delete:hover {
+            color: var(--danger);
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: var(--gray-400);
+            margin-right: var(--space-2);
+            transition: var(--transition);
+        }
+
+        .drag-handle:hover {
+            color: var(--gray-600);
+        }
+
+        /* Enhanced Add Column Button */
+        .add-column-btn {
+            width: 100%;
+            padding: var(--space-4);
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-lg);
+            background: transparent;
+            color: var(--gray-500);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-column-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .add-column-btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .add-column-btn:hover {
+            border-color: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .add-column-btn:hover i,
+        .add-column-btn:hover span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .add-column-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Preview Table */
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-3);
+        }
+
+        .preview-table th {
+            background: var(--gray-50);
+            padding: var(--space-2);
+            text-align: left;
+            font-weight: 500;
+            font-size: var(--text-sm);
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .preview-table td {
+            padding: var(--space-2);
+            border-bottom: 1px solid var(--gray-100);
+            font-size: var(--text-sm);
+            color: var(--gray-600);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-2);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: var(--text-sm);
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--gray-900);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input.error, .form-select.error, .form-textarea.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: var(--text-xs);
+            margin-top: var(--space-1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .form-checkbox input {
+            width: auto;
+        }
+
+        /* Options */
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+
+        .option-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .option-label {
+            font-size: var(--text-sm);
+            color: var(--gray-700);
+            cursor: pointer;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12);
+            color: var(--gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            opacity: 0.3;
+        }
+
+        .empty-state-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--gray-700);
+        }
+
+        .empty-state-text {
+            margin-bottom: var(--space-6);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: var(--header-height);
+            right: var(--space-6);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .toast {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: var(--space-3) var(--space-4);
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            box-shadow: var(--shadow-lg);
+            transform: translateX(100%);
+            transition: var(--transition-smooth);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        .toast.warning { border-left: 3px solid var(--warning); }
+        .toast.info { border-left: 3px solid var(--info); }
+
+        .toast-icon {
+            font-size: var(--text-lg);
+        }
+
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast.info .toast-icon { color: var(--info); }
+
+        .toast-message {
+            flex: 1;
+            font-size: var(--text-sm);
+            color: var(--gray-700);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-warning {
+            background-color: #fed7aa;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .search-filter-container {
+                flex-direction: column;
+            }
+
+            .data-table {
+                font-size: var(--text-xs);
+            }
+
+            .data-table th, .data-table td {
+                padding: var(--space-2);
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .table-builder {
+                grid-template-columns: 1fr;
+            }
+
+            .column-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .template-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .column-type-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Menu Toggle for Mobile */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: var(--text-lg);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .menu-toggle:hover {
+            background: var(--gray-100);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-size: var(--text-lg);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-6);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Column Counter */
+        .column-counter {
+            margin-left: auto;
+            font-size: var(--text-sm);
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .column-count {
+            background: var(--primary);
+            color: var(--white);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: var(--space-3);">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <i class="fas fa-bug"></i>
+                <span>QA Dashboard</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">
+                <span>QA Tables</span>
+                <button class="btn btn-sm btn-primary" id="newTableBtn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <ul class="table-list" id="tableList">
+                <!-- Table items will be dynamically added here -->
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1 class="content-title" id="contentTitle">QA Dashboard</h1>
+            <div class="content-actions" id="contentActions" style="display: none;">
+                <button class="btn btn-secondary" id="editTableBtn">
+                    <i class="fas fa-edit"></i> Edit Tabel
+                </button>
+                <button class="btn btn-danger" id="deleteTableBtn">
+                    <i class="fas fa-trash"></i> Hapus Tabel
+                </button>
+            </div>
+        </div>
+
+        <div id="tableContainer">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h2 class="empty-state-title">Tidak Ada Tabel QA</h2>
+                <p class="empty-state-text">Buat tabel QA baru untuk memulai proses testing</p>
+                <button class="btn btn-primary" id="emptyStateNewTableBtn">
+                    <i class="fas fa-plus"></i> Buat Tabel QA
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Enhanced New Table Modal -->
+    <div class="modal" id="newTableModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Buat Tabel QA Baru</h2>
+                <button class="modal-close" data-modal="newTableModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newTableForm">
+                    <!-- Template Selection -->
+                    <div class="builder-section">
+                        <div class="builder-title">
+                            <i class="fas fa-magic"></i>
+                            <span>Pilih Template QA</span>
+                        </div>
+                        <div class="template-grid" id="templateGrid">
+                            <div class="template-card" data-template="blank">
+                                <div class="template-icon"><i class="fas fa-file"></i></div>
+                                <div class="template-name">Kosong</div>
+                            </div>
+                            <div class="template-card" data-template="testcases">
+                                <div class="template-icon"><i class="fas fa-list-check"></i></div>
+                                <div class="template-name">Test Cases</div>
+                            </div>
+                            <div class="template-card" data-template="bugreports">
+                                <div class="template-icon"><i class="fas fa-bug"></i></div>
+                                <div class="template-name">Bug Reports</div>
+                            </div>
+                            <div class="template-card" data-template="testplan">
+                                <div class="template-icon"><i class="fas fa-clipboard"></i></div>
+                                <div class="template-name">Test Plan</div>
+                            </div>
+                            <div class="template-card" data-template="testexecution">
+                                <div class="template-icon"><i class="fas fa-play-circle"></i></div>
+                                <div class="template-name">Test Execution</div>
+                            </div>
+                            <div class="template-card" data-template="defecttracking">
+                                <div class="template-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="template-name">Defect Tracking</div>
+                            </div>
+                            <div class="template-card" data-template="requirements">
+                                <div class="template-icon"><i class="fas fa-requirements"></i></div>
+                                <div class="template-name">Requirements</div>
+                            </div>
+                            <div class="template-card" data-template="testenvironment">
+                                <div class="template-icon"><i class="fas fa-server"></i></div>
+                                <div class="template-name">Test Environment</div>
+                            </div>
+                            <div class="template-card" data-template="testdata">
+                                <div class="template-icon"><i class="fas fa-database"></i></div>
+                                <div class="template-name">Test Data</div>
+                            </div>
+                            <div class="template-card" data-template="releasetesting">
+                                <div class="template-icon"><i class="fas fa-rocket"></i></div>
+                                <div class="template-name">Release Testing</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Builder -->
+                    <div class="table-builder">
+                        <!-- Configuration -->
+                        <div class="builder-section">
+                            <div class="builder-title">
+                                <i class="fas fa-cog"></i>
+                                <span>Konfigurasi Tabel</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Nama Tabel</label>
+                                <input type="text" class="form-input" id="tableName" placeholder="Masukkan nama tabel QA" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Deskripsi</label>
+                                <textarea class="form-textarea" id="tableDescription" placeholder="Deskripsi tabel QA (opsional)"></textarea>
+                            </div>
+
+                            <div class="option-group">
+                                <input type="checkbox" class="option-checkbox" id="enableTimestamps">
+                                <label for="enableTimestamps" class="option-label">Tambah timestamp</label>
+                            </div>
+                            <div class="option-group">
+                                <input type="checkbox" class="option-checkbox" id="enableId" checked>
+                                <label for="enableId" class="option-label">Auto ID</label>
+                            </div>
+                        </div>
+
+                        <!-- Live Preview -->
+                        <div class="builder-section">
+                            <div class="builder-title">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview Tabel</span>
+                            </div>
+                            <div class="preview-container">
+                                <table class="preview-table" id="previewTable">
+                                    <thead>
+                                        <tr id="previewHeader">
+                                            <th>Preview</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr id="previewRow">
+                                            <td>Data contoh QA</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Columns Builder -->
+                    <div class="columns-builder">
+                        <div class="builder-title">
+                            <i class="fas fa-columns"></i>
+                            <span>Kolom Tabel</span>
+                            <div class="column-counter">
+                                <span id="columnCount">0</span>
+                                <span class="column-count">kolom</span>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Column Type Selector -->
+                        <div class="column-type-selector-wrapper" id="columnTypeSelectorWrapper">
+                            <div class="column-type-header">
+                                <span class="column-type-title">Pilih Tipe Kolom</span>
+                                <button class="close-type-selector" id="closeTypeSelector">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="column-type-selector">
+                                <div class="type-option" data-type="text">
+                                    <i class="fas fa-font"></i>
+                                    <span>Text</span>
+                                </div>
+                                <div class="type-option" data-type="number">
+                                    <i class="fas fa-hashtag"></i>
+                                    <span>Number</span>
+                                </div>
+                                <div class="type-option" data-type="date">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Date</span>
+                                </div>
+                                <div class="type-option" data-type="email">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Email</span>
+                                </div>
+                                <div class="type-option" data-type="url">
+                                    <i class="fas fa-link"></i>
+                                    <span>URL</span>
+                                </div>
+                                <div class="type-option" data-type="select">
+                                    <i class="fas fa-list"></i>
+                                    <span>Select</span>
+                                </div>
+                                <div class="type-option" data-type="checkbox">
+                                    <i class="fas fa-check-square"></i>
+                                    <span>Checkbox</span>
+                                </div>
+                                <div class="type-option" data-type="calc">
+                                    <i class="fas fa-calculator"></i>
+                                    <span>Calc</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="columnsContainer">
+                            <!-- Columns will be dynamically added here -->
+                        </div>
+
+                        <button type="button" class="add-column-btn" id="addColumnBtn">
+                            <i class="fas fa-plus"></i>
+                            <span>Tambah Kolom</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal="newTableModal">Batal</button>
+                <button type="submit" form="newTableForm" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Buat Tabel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Table Modal -->
+    <div class="modal" id="editTableModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Tabel QA</h2>
+                <button class="modal-close" data-modal="editTableModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editTableForm">
+                    <div class="form-group">
+                        <label class="form-label">Nama Tabel</label>
+                        <input type="text" class="form-input" id="editTableName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="form-textarea" id="editTableDescription"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal="editTableModal">Batal</button>
+                <button type="submit" form="editTableForm" class="btn btn-primary">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Data Modal -->
+    <div class="modal" id="addDataModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Tambah Data Baru</h2>
+                <button class="modal-close" data-modal="addDataModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addDataForm">
+                    <!-- Form fields will be dynamically added here -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal="addDataModal">Batal</button>
+                <button type="submit" form="addDataForm" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tambah Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Data Modal -->
+    <div class="modal" id="editDataModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Data</h2>
+                <button class="modal-close" data-modal="editDataModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editDataForm">
+                    <!-- Form fields will be dynamically added here -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal="editDataModal">Batal</button>
+                <button type="submit" form="editDataForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Konfirmasi Hapus</h2>
+                <button class="modal-close" data-modal="deleteModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus <span id="deleteTarget"></span>?</p>
+                <p style="color: var(--danger); font-size: var(--text-sm); margin-top: var(--space-2);">Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal="deleteModal">Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // App State
+        const app = {
+            tables: [],
+            currentTableId: null,
+            selectedTemplate: 'blank',
+            columns: [],
+            draggedColumn: null,
+            deleteTarget: null,
+            editingRowId: null,
+            currentPage: 1,
+            itemsPerPage: 10,
+            searchTerm: '',
+            sortColumn: null,
+            sortDirection: 'asc',
+            isAddingColumn: false,
+            selectedColumnType: 'text'
+        };
+
+        // QA Templates
+        const templates = {
+            blank: {
+                name: 'Tabel Kosong',
+                description: 'Tabel kosong tanpa kolom',
+                columns: []
+            },
+            testcases: {
+                name: 'Test Cases',
+                description: 'Tabel untuk mengelola test cases',
+                columns: [
+                    { name: 'Test Case ID', type: 'text', required: true },
+                    { name: 'Test Title', type: 'text', required: true },
+                    { name: 'Description', type: 'text', required: false },
+                    { name: 'Priority', type: 'select', required: true, options: ['Critical', 'High', 'Medium', 'Low'] },
+                    { name: 'Status', type: 'select', required: true, options: ['Draft', 'Ready', 'Deprecated'] },
+                    { name: 'Author', type: 'text', required: true },
+                    { name: 'Created Date', type: 'date', required: true }
+                ]
+            },
+            bugreports: {
+                name: 'Bug Reports',
+                description: 'Tabel untuk melacak bug reports',
+                columns: [
+                    { name: 'Bug ID', type: 'text', required: true },
+                    { name: 'Title', type: 'text', required: true },
+                    { name: 'Description', type: 'text', required: true },
+                    { name: 'Severity', type: 'select', required: true, options: ['Blocker', 'Critical', 'Major', 'Minor', 'Trivial'] },
+                    { name: 'Priority', type: 'select', required: true, options: ['Highest', 'High', 'Medium', 'Low', 'Lowest'] },
+                    { name: 'Status', type: 'select', required: true, options: ['New', 'Assigned', 'In Progress', 'Resolved', 'Closed', 'Reopened'] },
+                    { name: 'Reporter', type: 'text', required: true },
+                    { name: 'Reported Date', type: 'date', required: true }
+                ]
+            },
+            testplan: {
+                name: 'Test Plan',
+                description: 'Tabel untuk mengelola test plan',
+                columns: [
+                    { name: 'Plan ID', type: 'text', required: true },
+                    { name: 'Plan Name', type: 'text', required: true },
+                    { name: 'Version', type: 'text', required: true },
+                    { name: 'Objective', type: 'text', required: true },
+                    { name: 'Status', type: 'select', required: true, options: ['Draft', 'Reviewed', 'Approved', 'Active'] },
+                    { name: 'Schedule', type: 'date', required: true }
+                ]
+            },
+            testexecution: {
+                name: 'Test Execution',
+                description: 'Tabel untuk tracking test execution',
+                columns: [
+                    { name: 'Execution ID', type: 'text', required: true },
+                    { name: 'Test Case ID', type: 'text', required: true },
+                    { name: 'Execution Date', type: 'date', required: true },
+                    { name: 'Tester', type: 'text', required: true },
+                    { name: 'Result', type: 'select', required: true, options: ['Pass', 'Fail', 'Blocked', 'Skipped', 'Not Executed'] },
+                    { name: 'Build Version', type: 'text', required: true }
+                ]
+            },
+            defecttracking: {
+                name: 'Defect Tracking',
+                description: 'Tabel untuk tracking defect resolution',
+                columns: [
+                    { name: 'Defect ID', type: 'text', required: true },
+                    { name: 'Title', type: 'text', required: true },
+                    { name: 'Category', type: 'select', required: true, options: ['UI', 'Functional', 'Performance', 'Security', 'Compatibility'] },
+                    { name: 'Detected By', type: 'text', required: true },
+                    { name: 'Detected Date', type: 'date', required: true },
+                    { name: 'Status', type: 'select', required: true, options: ['Open', 'In Progress', 'Fixed', 'Verified', 'Closed', 'Reopened'] }
+                ]
+            },
+            requirements: {
+                name: 'Requirements Traceability',
+                description: 'Tabel untuk requirements traceability',
+                columns: [
+                    { name: 'Requirement ID', type: 'text', required: true },
+                    { name: 'Title', type: 'text', required: true },
+                    { name: 'Description', type: 'text', required: true },
+                    { name: 'Type', type: 'select', required: true, options: ['Functional', 'Non-Functional', 'Business', 'User', 'System'] },
+                    { name: 'Priority', type: 'select', required: true, options: ['Must Have', 'Should Have', 'Could Have', 'Won\'t Have'] },
+                    { name: 'Status', type: 'select', required: true, options: ['Draft', 'Approved', 'Implemented', 'Verified', 'Rejected'] }
+                ]
+            },
+            testenvironment: {
+                name: 'Test Environment',
+                description: 'Tabel untuk mengelola test environment',
+                columns: [
+                    { name: 'Environment ID', type: 'text', required: true },
+                    { name: 'Environment Name', type: 'text', required: true },
+                    { name: 'Type', type: 'select', required: true, options: ['Development', 'Testing', 'Staging', 'Production'] },
+                    { name: 'OS', type: 'text', required: true },
+                    { name: 'URL/Endpoint', type: 'url', required: false },
+                    { name: 'Status', type: 'select', required: true, options: ['Active', 'Inactive', 'Maintenance'] },
+                    { name: 'Last Updated', type: 'date', required: true }
+                ]
+            },
+            testdata: {
+                name: 'Test Data Management',
+                description: 'Tabel untuk mengelola test data',
+                columns: [
+                    { name: 'Data ID', type: 'text', required: true },
+                    { name: 'Data Name', type: 'text', required: true },
+                    { name: 'Description', type: 'text', required: false },
+                    { name: 'Data Type', type: 'select', required: true, options: ['Valid', 'Invalid', 'Boundary', 'Negative', 'Special Characters'] },
+                    { name: 'Module', type: 'text', required: true },
+                    { name: 'Status', type: 'select', required: true, options: ['Active', 'Archived', 'Deprecated'] },
+                    { name: 'Created By', type: 'text', required: true },
+                    { name: 'Created Date', type: 'date', required: true }
+                ]
+            },
+            releasetesting: {
+                name: 'Release Testing',
+                description: 'Tabel untuk release testing',
+                columns: [
+                    { name: 'Release ID', type: 'text', required: true },
+                    { name: 'Release Version', type: 'text', required: true },
+                    { name: 'Release Name', type: 'text', required: true },
+                    { name: 'Release Date', type: 'date', required: true },
+                    { name: 'Test Lead', type: 'text', required: true },
+                    { name: 'Total Test Cases', type: 'number', required: true },
+                    { name: 'Passed', type: 'number', required: false },
+                    { name: 'Failed', type: 'number', required: false },
+                    { name: 'Release Status', type: 'select', required: true, options: ['In Progress', 'Completed', 'On Hold', 'Cancelled', 'Released'] }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const elements = {
+            themeToggle: document.getElementById('themeToggle'),
+            menuToggle: document.getElementById('menuToggle'),
+            sidebar: document.getElementById('sidebar'),
+            tableList: document.getElementById('tableList'),
+            contentTitle: document.getElementById('contentTitle'),
+            contentActions: document.getElementById('contentActions'),
+            tableContainer: document.getElementById('tableContainer'),
+            newTableBtn: document.getElementById('newTableBtn'),
+            emptyStateNewTableBtn: document.getElementById('emptyStateNewTableBtn'),
+            editTableBtn: document.getElementById('editTableBtn'),
+            deleteTableBtn: document.getElementById('deleteTableBtn'),
+            newTableModal: document.getElementById('newTableModal'),
+            editTableModal: document.getElementById('editTableModal'),
+            addDataModal: document.getElementById('addDataModal'),
+            editDataModal: document.getElementById('editDataModal'),
+            deleteModal: document.getElementById('deleteModal'),
+            confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
+            deleteTarget: document.getElementById('deleteTarget'),
+            toastContainer: document.getElementById('toastContainer'),
+            templateGrid: document.getElementById('templateGrid'),
+            columnsContainer: document.getElementById('columnsContainer'),
+            addColumnBtn: document.getElementById('addColumnBtn'),
+            columnTypeSelectorWrapper: document.getElementById('columnTypeSelectorWrapper'),
+            closeTypeSelector: document.getElementById('closeTypeSelector'),
+            columnCount: document.getElementById('columnCount'),
+            previewTable: document.getElementById('previewTable'),
+            previewHeader: document.getElementById('previewHeader'),
+            previewRow: document.getElementById('previewRow')
+        };
+
+        // Initialize App
+        function init() {
+            loadFromLocalStorage();
+            setupEventListeners();
+            renderTableList();
+            checkTheme();
+            
+            if (app.tables.length === 0) {
+                showEmptyState();
+            } else {
+                selectTable(app.tables[0].id);
+            }
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Theme toggle
+            elements.themeToggle.addEventListener('click', toggleTheme);
+            
+            // Menu toggle for mobile
+            elements.menuToggle.addEventListener('click', () => {
+                elements.sidebar.classList.toggle('active');
+            });
+            
+            // New table buttons
+            elements.newTableBtn.addEventListener('click', () => openModal('newTableModal'));
+            elements.emptyStateNewTableBtn.addEventListener('click', () => openModal('newTableModal'));
+            
+            // Edit and delete table buttons
+            elements.editTableBtn.addEventListener('click', () => openEditTableModal());
+            elements.deleteTableBtn.addEventListener('click', () => openDeleteModal('table', app.currentTableId));
+            
+            // Modal close buttons
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const modalId = e.target.closest('.modal-close').getAttribute('data-modal');
+                    closeModal(modalId);
+                });
+            });
+            
+            // Modal footer cancel buttons
+            document.querySelectorAll('.modal-footer .btn-secondary').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (e.target.hasAttribute('data-modal')) {
+                        const modalId = e.target.getAttribute('data-modal');
+                        closeModal(modalId);
+                    }
+                });
+            });
+            
+            // Template selection
+            elements.templateGrid.addEventListener('click', (e) => {
+                const templateCard = e.target.closest('.template-card');
+                if (templateCard) {
+                    selectTemplate(templateCard.getAttribute('data-template'));
+                }
+            });
+            
+            // Enhanced Add Column Button
+            elements.addColumnBtn.addEventListener('click', toggleColumnTypeSelector);
+            
+            // Close Type Selector
+            elements.closeTypeSelector.addEventListener('click', hideColumnTypeSelector);
+            
+            // Column type selection
+            document.querySelectorAll('.type-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    selectColumnType(option);
+                });
+            });
+            
+            // Form submissions
+            document.getElementById('newTableForm').addEventListener('submit', handleNewTableSubmit);
+            document.getElementById('editTableForm').addEventListener('submit', handleEditTableSubmit);
+            document.getElementById('addDataForm').addEventListener('submit', handleAddDataSubmit);
+            document.getElementById('editDataForm').addEventListener('submit', handleEditDataSubmit);
+            
+            // Confirm delete
+            elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
+            
+            // Table name input for live preview
+            document.getElementById('tableName').addEventListener('input', updatePreview);
+            
+            // Close modals on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideColumnTypeSelector();
+                    document.querySelectorAll('.modal.active').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                }
+            });
+            
+            // Click outside to close type selector
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.column-type-selector-wrapper') && 
+                    !e.target.closest('.add-column-btn') &&
+                    elements.columnTypeSelectorWrapper.classList.contains('active')) {
+                    hideColumnTypeSelector();
+                }
+            });
+        }
+
+        // Enhanced Column Type Selector Functions
+        function toggleColumnTypeSelector() {
+            if (elements.columnTypeSelectorWrapper.classList.contains('active')) {
+                hideColumnTypeSelector();
+            } else {
+                showColumnTypeSelector();
+            }
+        }
+
+        function showColumnTypeSelector() {
+            elements.columnTypeSelectorWrapper.classList.add('active');
+            elements.addColumnBtn.classList.add('active');
+            elements.addColumnBtn.innerHTML = '<i class="fas fa-times"></i><span>Batal</span>';
+            app.isAddingColumn = true;
+            
+            // Focus first type option
+            setTimeout(() => {
+                document.querySelector('.type-option').focus();
+            }, 100);
+        }
+
+        function hideColumnTypeSelector() {
+            elements.columnTypeSelectorWrapper.classList.remove('active');
+            elements.addColumnBtn.classList.remove('active');
+            elements.addColumnBtn.innerHTML = '<i class="fas fa-plus"></i><span>Tambah Kolom</span>';
+            app.isAddingColumn = false;
+            
+            // Reset selection
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+
+        function selectColumnType(option) {
+            // Remove previous selection
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            option.classList.add('selected');
+            
+            const type = option.getAttribute('data-type');
+            app.selectedColumnType = type;
+            
+            // Add new column with selected type
+            addNewColumn(type);
+            
+            // Hide selector after selection
+            setTimeout(() => {
+                hideColumnTypeSelector();
+            }, 300);
+        }
+
+        // Template Selection
+        function selectTemplate(templateName) {
+            app.selectedTemplate = templateName;
+            
+            // Update UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-template="${templateName}"]`).classList.add('selected');
+            
+            // Load template columns
+            const template = templates[templateName];
+            app.columns = template.columns.map(col => ({
+                ...col,
+                id: generateId()
+            }));
+            
+            // Update table name
+            document.getElementById('tableName').value = template.name;
+            
+            // Render columns
+            renderColumns();
+            updatePreview();
+            updateColumnCount();
+        }
+
+        // Column Management
+        function addNewColumn(type = null) {
+            const columnType = type || app.selectedColumnType || 'text';
+            
+            const newColumn = {
+                id: generateId(),
+                name: '',
+                type: columnType,
+                required: false,
+                unique: false,
+                defaultValue: '',
+                options: columnType === 'select' ? ['Option 1', 'Option 2'] : []
+            };
+            
+            app.columns.push(newColumn);
+            renderColumns();
+            updatePreview();
+            updateColumnCount();
+            
+            // Show success feedback
+            showToast('success', `Kolom tipe ${columnType} ditambahkan`);
+            
+            // Focus on the new column name input
+            setTimeout(() => {
+                const newColumnInput = document.querySelector(`[data-column-id="${newColumn.id}"][data-field="name"]`);
+                if (newColumnInput) {
+                    newColumnInput.focus();
+                }
+            }, 100);
+        }
+
+        function renderColumns() {
+            elements.columnsContainer.innerHTML = '';
+            
+            app.columns.forEach((column, index) => {
+                const columnElement = createColumnElement(column, index);
+                elements.columnsContainer.appendChild(columnElement);
+            });
+            
+            setupColumnEventListeners();
+        }
+
+        function createColumnElement(column, index) {
+            const div = document.createElement('div');
+            div.className = 'column-item';
+            div.draggable = true;
+            div.dataset.columnId = column.id;
+            
+            div.innerHTML = `
+                <div class="column-header">
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <i class="fas fa-grip-vertical drag-handle"></i>
+                        <span class="column-type-badge type-${column.type}">${column.type}</span>
+                        <input type="text" class="form-input" placeholder="Nama Kolom" value="${column.name}" 
+                               style="width: 200px;" data-column-id="${column.id}" data-field="name">
+                    </div>
+                    <div class="column-actions">
+                        <button class="column-action-btn" onclick="duplicateColumn('${column.id}')" title="Duplikat">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="column-action-btn delete" onclick="removeColumn('${column.id}')" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="column-fields">
+                    <div class="column-field">
+                        <label class="form-label">Default Value</label>
+                        <input type="text" class="form-input" placeholder="Default value" 
+                               value="${column.defaultValue || ''}" 
+                               data-column-id="${column.id}" data-field="defaultValue">
+                    </div>
+                    <div class="column-field">
+                        <label class="form-label">Placeholder</label>
+                        <input type="text" class="form-input" placeholder="Placeholder text" 
+                               data-column-id="${column.id}" data-field="placeholder">
+                    </div>
+                    ${column.type === 'select' ? `
+                        <div class="column-field" style="grid-column: 1 / -1;">
+                            <label class="form-label">Options (comma separated)</label>
+                            <input type="text" class="form-input" placeholder="Option 1, Option 2, Option 3" 
+                                   value="${column.options.join(', ')}" 
+                                   data-column-id="${column.id}" data-field="options">
+                        </div>
+                    ` : ''}
+                </div>
+                <div style="margin-top: var(--space-2); display: flex; gap: var(--space-4);">
+                    <label style="display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm);">
+                        <input type="checkbox" ${column.required ? 'checked' : ''} 
+                               data-column-id="${column.id}" data-field="required">
+                        Required
+                    </label>
+                    <label style="display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm);">
+                        <input type="checkbox" ${column.unique ? 'checked' : ''} 
+                               data-column-id="${column.id}" data-field="unique">
+                        Unique
+                    </label>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function setupColumnEventListeners() {
+            // Drag and drop
+            document.querySelectorAll('.column-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // Field updates
+            document.querySelectorAll('[data-column-id]').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const columnId = e.target.getAttribute('data-column-id');
+                    const field = e.target.getAttribute('data-field');
+                    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+                    
+                    const column = app.columns.find(c => c.id === columnId);
+                    if (column) {
+                        if (field === 'options') {
+                            column[field] = value.split(',').map(opt => opt.trim());
+                        } else {
+                            column[field] = value;
+                        }
+                        updatePreview();
+                    }
+                });
+            });
+        }
+
+        function removeColumn(columnId) {
+            const columnIndex = app.columns.findIndex(c => c.id === columnId);
+            if (columnIndex !== -1) {
+                const columnName = app.columns[columnIndex].name || 'Kolom tanpa nama';
+                app.columns.splice(columnIndex, 1);
+                renderColumns();
+                updatePreview();
+                updateColumnCount();
+                showToast('info', `${columnName} dihapus`);
+            }
+        }
+
+        function duplicateColumn(columnId) {
+            const column = app.columns.find(c => c.id === columnId);
+            if (column) {
+                const newColumn = {
+                    ...column,
+                    id: generateId(),
+                    name: column.name + ' (Copy)'
+                };
+                app.columns.push(newColumn);
+                renderColumns();
+                updatePreview();
+                updateColumnCount();
+                showToast('success', `Kolom ${column.name} diduplikasi`);
+            }
+        }
+
+        // Update column count
+        function updateColumnCount() {
+            elements.columnCount.textContent = app.columns.length;
+        }
+
+        // Drag and Drop Handlers
+        function handleDragStart(e) {
+            app.draggedColumn = e.target;
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(elements.columnsContainer, e.clientY);
+            if (afterElement == null) {
+                elements.columnsContainer.appendChild(app.draggedColumn);
+            } else {
+                elements.columnsContainer.insertBefore(app.draggedColumn, afterElement);
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            updateColumnsOrder();
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.column-item:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function updateColumnsOrder() {
+            const columnElements = elements.columnsContainer.querySelectorAll('.column-item');
+            const newOrder = [];
+            
+            columnElements.forEach(element => {
+                const columnId = element.getAttribute('data-column-id');
+                const column = app.columns.find(c => c.id === columnId);
+                if (column) {
+                    newOrder.push(column);
+                }
+            });
+            
+            app.columns = newOrder;
+            updatePreview();
+        }
+
+        // Live Preview
+        function updatePreview() {
+            const tableName = document.getElementById('tableName').value || 'Nama Tabel';
+            
+            // Update header
+            let headerHTML = '';
+            app.columns.forEach(column => {
+                headerHTML += `<th>${column.name || 'Kolom'}</th>`;
+            });
+            elements.previewHeader.innerHTML = headerHTML || '<th>Preview</th>';
+            
+            // Update sample row
+            let rowHTML = '';
+            app.columns.forEach(column => {
+                let sampleValue = getSampleValue(column);
+                rowHTML += `<td>${sampleValue}</td>`;
+            });
+            elements.previewRow.innerHTML = rowHTML || '<td>Data contoh QA</td>';
+        }
+
+        function getSampleValue(column) {
+            const samples = {
+                text: 'Contoh teks QA',
+                number: '123',
+                date: '2024-01-01',
+                email: 'qa@example.com',
+                url: 'https://example.com',
+                select: column.options[0] || 'Pilih',
+                checkbox: '<input type="checkbox" disabled>',
+                calc: '0'
+            };
+            
+            return samples[column.type] || '';
+        }
+
+        // Table Management
+        function selectTable(tableId) {
+            app.currentTableId = tableId;
+            const table = app.tables.find(t => t.id === tableId);
+            
+            if (table) {
+                elements.contentTitle.textContent = table.name;
+                elements.contentActions.style.display = 'flex';
+                renderTableView(table);
+            }
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.table-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-table-id') === tableId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Close sidebar on mobile after selection
+            if (window.innerWidth <= 768) {
+                elements.sidebar.classList.remove('active');
+            }
+        }
+
+        function renderTableView(table) {
+            // Filter and sort data
+            let filteredData = [...table.rows];
+            
+            if (app.searchTerm) {
+                filteredData = filteredData.filter(row => {
+                    return Object.values(row).some(value => 
+                        String(value).toLowerCase().includes(app.searchTerm.toLowerCase())
+                    );
+                });
+            }
+            
+            if (app.sortColumn) {
+                filteredData.sort((a, b) => {
+                    const valueA = a[app.sortColumn] || '';
+                    const valueB = b[app.sortColumn] || '';
+                    
+                    if (app.sortDirection === 'asc') {
+                        return valueA > valueB ? 1 : -1;
+                    } else {
+                        return valueA < valueB ? 1 : -1;
+                    }
+                });
+            }
+            
+            // Pagination
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / app.itemsPerPage);
+            const startIndex = (app.currentPage - 1) * app.itemsPerPage;
+            const endIndex = startIndex + app.itemsPerPage;
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+            
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">${table.name}</h3>
+                        <div class="content-actions">
+                            <button class="btn btn-primary" onclick="openAddDataModal()">
+                                <i class="fas fa-plus"></i> Tambah Data
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="margin-bottom: var(--space-3);"><strong>Deskripsi:</strong> ${table.description || 'Tidak ada deskripsi'}</p>
+                        <p style="margin-bottom: var(--space-4);"><strong>Total Data:</strong> ${table.rows.length} baris</p>
+                        
+                        <div class="search-filter-container">
+                            <div class="search-box">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" placeholder="Cari data..." id="searchInput">
+                            </div>
+                        </div>
+            `;
+            
+            if (paginatedData.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h4 class="empty-state-title">Tidak Ada Data</h4>
+                        <p class="empty-state-text">Tambah data baru atau ubah filter pencarian</p>
+                        <button class="btn btn-primary" onclick="openAddDataModal()">
+                            <i class="fas fa-plus"></i> Tambah Data
+                        </button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                `;
+                
+                table.columns.forEach(column => {
+                    const sortIcon = app.sortColumn === column.name 
+                        ? `<i class="fas fa-sort-${app.sortDirection === 'asc' ? 'up' : 'down'} sort-icon active"></i>`
+                        : `<i class="fas fa-sort sort-icon"></i>`;
+                    
+                    html += `
+                        <th onclick="sortTable('${column.name}')">
+                            ${column.name} ${sortIcon}
+                        </th>
+                    `;
+                });
+                
+                html += `
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                paginatedData.forEach(row => {
+                    html += `
+                        <tr>
+                    `;
+                    
+                    table.columns.forEach(column => {
+                        let value = row[column.name] || '';
+                        
+                        // Format value based on type
+                        if (column.type === 'date' && value) {
+                            value = new Date(value).toLocaleDateString('id-ID');
+                        } else if (column.type === 'select' && value) {
+                            const badgeClass = getBadgeClass(value);
+                            value = `<span class="badge ${badgeClass}">${value}</span>`;
+                        }
+                        
+                        html += `
+                            <td>${value}</td>
+                        `;
+                    });
+                    
+                    html += `
+                            <td>
+                                <div class="table-actions">
+                                    <button class="action-btn edit" onclick="openEditDataModal('${row.id}')" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="openDeleteModal('row', '${row.id}')" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                // Pagination
+                if (totalPages > 1) {
+                    html += `
+                        <div class="pagination">
+                            <button class="page-btn" ${app.currentPage === 1 ? 'disabled' : ''} onclick="changePage(${app.currentPage - 1})">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                    `;
+                    
+                    for (let i = 1; i <= totalPages; i++) {
+                        if (i === 1 || i === totalPages || (i >= app.currentPage - 1 && i <= app.currentPage + 1)) {
+                            html += `
+                                <button class="page-btn ${i === app.currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>
+                            `;
+                        } else if (i === app.currentPage - 2 || i === app.currentPage + 2) {
+                            html += `<span>...</span>`;
+                        }
+                    }
+                    
+                    html += `
+                            <button class="page-btn" ${app.currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${app.currentPage + 1})">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <span class="page-info">Halaman ${app.currentPage} dari ${totalPages}</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            elements.tableContainer.innerHTML = html;
+            
+            // Setup search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = app.searchTerm;
+                searchInput.addEventListener('input', (e) => {
+                    app.searchTerm = e.target.value;
+                    app.currentPage = 1;
+                    renderTableView(table);
+                });
+            }
+        }
+
+        function getBadgeClass(value) {
+            const valueLower = value.toLowerCase();
+            if (valueLower.includes('pass') || valueLower.includes('active') || valueLower.includes('approved') || valueLower.includes('completed')) {
+                return 'badge-success';
+            } else if (valueLower.includes('fail') || valueLower.includes('critical') || valueLower.includes('blocker') || valueLower.includes('high')) {
+                return 'badge-danger';
+            } else if (valueLower.includes('progress') || valueLower.includes('pending') || valueLower.includes('medium')) {
+                return 'badge-warning';
+            } else {
+                return 'badge-info';
+            }
+        }
+
+        function sortTable(columnName) {
+            if (app.sortColumn === columnName) {
+                app.sortDirection = app.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                app.sortColumn = columnName;
+                app.sortDirection = 'asc';
+            }
+            
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (table) {
+                renderTableView(table);
+            }
+        }
+
+        function changePage(page) {
+            app.currentPage = page;
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (table) {
+                renderTableView(table);
+            }
+        }
+
+        // Data Management
+        function openAddDataModal() {
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (!table) return;
+            
+            const form = document.getElementById('addDataForm');
+            form.innerHTML = '';
+            
+            table.columns.forEach(column => {
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                let inputHtml = '';
+                const required = column.required ? 'required' : '';
+                
+                switch (column.type) {
+                    case 'text':
+                    case 'email':
+                    case 'url':
+                        inputHtml = `<input type="${column.type}" class="form-input" name="${column.name}" placeholder="${column.name}" ${required}>`;
+                        break;
+                    case 'number':
+                        inputHtml = `<input type="number" class="form-input" name="${column.name}" placeholder="${column.name}" ${required}>`;
+                        break;
+                    case 'date':
+                        inputHtml = `<input type="date" class="form-input" name="${column.name}" ${required}>`;
+                        break;
+                    case 'select':
+                        inputHtml = `
+                            <select class="form-select" name="${column.name}" ${required}>
+                                <option value="">Pilih ${column.name}</option>
+                                ${column.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                            </select>
+                        `;
+                        break;
+                    case 'checkbox':
+                        inputHtml = `
+                            <div class="form-checkbox">
+                                <input type="checkbox" name="${column.name}" id="add_${column.name}">
+                                <label for="add_${column.name}">${column.name}</label>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        inputHtml = `<input type="text" class="form-input" name="${column.name}" placeholder="${column.name}" ${required}>`;
+                }
+                
+                formGroup.innerHTML = `
+                    <label class="form-label">${column.name} ${column.required ? '<span style="color: var(--danger);">*</span>' : ''}</label>
+                    ${inputHtml}
+                `;
+                
+                form.appendChild(formGroup);
+            });
+            
+            openModal('addDataModal');
+        }
+
+        function handleAddDataSubmit(e) {
+            e.preventDefault();
+            
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (!table) return;
+            
+            const formData = new FormData(e.target);
+            const newRow = { id: generateId() };
+            
+            // Validate and collect data
+            let isValid = true;
+            table.columns.forEach(column => {
+                let value;
+                
+                if (column.type === 'checkbox') {
+                    value = formData.has(column.name);
+                } else {
+                    value = formData.get(column.name) || '';
+                }
+                
+                // Validation
+                if (column.required && !value) {
+                    isValid = false;
+                    showToast('error', `${column.name} harus diisi`);
+                    return;
+                }
+                
+                if (column.type === 'email' && value && !validateEmail(value)) {
+                    isValid = false;
+                    showToast('error', `${column.name} harus email yang valid`);
+                    return;
+                }
+                
+                if (column.type === 'url' && value && !validateUrl(value)) {
+                    isValid = false;
+                    showToast('error', `${column.name} harus URL yang valid`);
+                    return;
+                }
+                
+                newRow[column.name] = value;
+            });
+            
+            if (!isValid) return;
+            
+            // Add created timestamp
+            newRow.createdAt = new Date().toISOString();
+            
+            // Add row to table
+            table.rows.push(newRow);
+            saveToLocalStorage();
+            
+            closeModal('addDataModal');
+            renderTableView(table);
+            showToast('success', 'Data berhasil ditambahkan');
+            
+            // Reset form
+            e.target.reset();
+        }
+
+        function openEditDataModal(rowId) {
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (!table) return;
+            
+            const row = table.rows.find(r => r.id === rowId);
+            if (!row) return;
+            
+            app.editingRowId = rowId;
+            
+            const form = document.getElementById('editDataForm');
+            form.innerHTML = '';
+            
+            table.columns.forEach(column => {
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                let inputHtml = '';
+                const required = column.required ? 'required' : '';
+                const value = row[column.name] || '';
+                
+                switch (column.type) {
+                    case 'text':
+                    case 'email':
+                    case 'url':
+                        inputHtml = `<input type="${column.type}" class="form-input" name="${column.name}" value="${value}" placeholder="${column.name}" ${required}>`;
+                        break;
+                    case 'number':
+                        inputHtml = `<input type="number" class="form-input" name="${column.name}" value="${value}" placeholder="${column.name}" ${required}>`;
+                        break;
+                    case 'date':
+                        inputHtml = `<input type="date" class="form-input" name="${column.name}" value="${value}" ${required}>`;
+                        break;
+                    case 'select':
+                        inputHtml = `
+                            <select class="form-select" name="${column.name}" ${required}>
+                                <option value="">Pilih ${column.name}</option>
+                                ${column.options.map(opt => `<option value="${opt}" ${opt === value ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                        `;
+                        break;
+                    case 'checkbox':
+                        inputHtml = `
+                            <div class="form-checkbox">
+                                <input type="checkbox" name="${column.name}" id="edit_${column.name}" ${value ? 'checked' : ''}>
+                                <label for="edit_${column.name}">${column.name}</label>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        inputHtml = `<input type="text" class="form-input" name="${column.name}" value="${value}" placeholder="${column.name}" ${required}>`;
+                }
+                
+                formGroup.innerHTML = `
+                    <label class="form-label">${column.name} ${column.required ? '<span style="color: var(--danger);">*</span>' : ''}</label>
+                    ${inputHtml}
+                `;
+                
+                form.appendChild(formGroup);
+            });
+            
+            openModal('editDataModal');
+        }
+
+        function handleEditDataSubmit(e) {
+            e.preventDefault();
+            
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (!table) return;
+            
+            const formData = new FormData(e.target);
+            const rowIndex = table.rows.findIndex(r => r.id === app.editingRowId);
+            
+            if (rowIndex === -1) return;
+            
+            // Validate and update data
+            let isValid = true;
+            table.columns.forEach(column => {
+                let value;
+                
+                if (column.type === 'checkbox') {
+                    value = formData.has(column.name);
+                } else {
+                    value = formData.get(column.name) || '';
+                }
+                
+                // Validation
+                if (column.required && !value) {
+                    isValid = false;
+                    showToast('error', `${column.name} harus diisi`);
+                    return;
+                }
+                
+                if (column.type === 'email' && value && !validateEmail(value)) {
+                    isValid = false;
+                    showToast('error', `${column.name} harus email yang valid`);
+                    return;
+                }
+                
+                if (column.type === 'url' && value && !validateUrl(value)) {
+                    isValid = false;
+                    showToast('error', `${column.name} harus URL yang valid`);
+                    return;
+                }
+                
+                table.rows[rowIndex][column.name] = value;
+            });
+            
+            if (!isValid) return;
+            
+            // Update timestamp
+            table.rows[rowIndex].updatedAt = new Date().toISOString();
+            
+            saveToLocalStorage();
+            closeModal('editDataModal');
+            renderTableView(table);
+            showToast('success', 'Data berhasil diperbarui');
+            
+            app.editingRowId = null;
+        }
+
+        // Form Submissions
+        function handleNewTableSubmit(e) {
+            e.preventDefault();
+            
+            const tableName = document.getElementById('tableName').value.trim();
+            const tableDescription = document.getElementById('tableDescription').value.trim();
+            
+            if (!tableName) {
+                showToast('error', 'Nama tabel harus diisi');
+                return;
+            }
+            
+            if (app.columns.length === 0) {
+                showToast('error', 'Setidaknya tambahkan satu kolom');
+                return;
+            }
+            
+            // Validate column names
+            const invalidColumns = app.columns.filter(c => !c.name.trim());
+            if (invalidColumns.length > 0) {
+                showToast('error', 'Semua kolom harus memiliki nama');
+                return;
+            }
+            
+            const newTable = {
+                id: generateId(),
+                name: tableName,
+                description: tableDescription,
+                columns: app.columns.map(c => ({
+                    name: c.name,
+                    type: c.type,
+                    required: c.required,
+                    unique: c.unique,
+                    defaultValue: c.defaultValue,
+                    options: c.options
+                })),
+                rows: [],
+                settings: {
+                    enableTimestamps: document.getElementById('enableTimestamps').checked,
+                    enableId: document.getElementById('enableId').checked
+                },
+                createdAt: new Date().toISOString()
+            };
+            
+            app.tables.push(newTable);
+            saveToLocalStorage();
+            renderTableList();
+            selectTable(newTable.id);
+            closeModal('newTableModal');
+            showToast('success', `Tabel QA "${tableName}" berhasil dibuat dengan ${app.columns.length} kolom`);
+            
+            // Reset form
+            resetNewTableForm();
+        }
+
+        function handleEditTableSubmit(e) {
+            e.preventDefault();
+            
+            const tableName = document.getElementById('editTableName').value.trim();
+            const tableDescription = document.getElementById('editTableDescription').value.trim();
+            
+            if (!tableName) {
+                showToast('error', 'Nama tabel harus diisi');
+                return;
+            }
+            
+            const tableIndex = app.tables.findIndex(t => t.id === app.currentTableId);
+            if (tableIndex === -1) return;
+            
+            app.tables[tableIndex].name = tableName;
+            app.tables[tableIndex].description = tableDescription;
+            
+            saveToLocalStorage();
+            renderTableList();
+            elements.contentTitle.textContent = tableName;
+            closeModal('editTableModal');
+            showToast('success', 'Tabel QA berhasil diperbarui');
+        }
+
+        function resetNewTableForm() {
+            document.getElementById('newTableForm').reset();
+            app.columns = [];
+            app.selectedTemplate = 'blank';
+            hideColumnTypeSelector();
+            renderColumns();
+            updatePreview();
+            updateColumnCount();
+            
+            // Reset template selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector('[data-template="blank"]').classList.add('selected');
+        }
+
+        // Delete Functions
+        function openDeleteModal(type, id) {
+            let targetText = '';
+            
+            if (type === 'table') {
+                const table = app.tables.find(t => t.id === id);
+                targetText = `tabel QA "${table.name}"`;
+                app.deleteTarget = { type, id };
+            } else if (type === 'row') {
+                targetText = 'data ini';
+                app.deleteTarget = { type, id };
+            }
+            
+            elements.deleteTarget.textContent = targetText;
+            openModal('deleteModal');
+        }
+
+        function confirmDelete() {
+            if (!app.deleteTarget) return;
+            
+            const { type, id } = app.deleteTarget;
+            
+            if (type === 'table') {
+                const tableIndex = app.tables.findIndex(t => t.id === id);
+                if (tableIndex !== -1) {
+                    const tableName = app.tables[tableIndex].name;
+                    app.tables.splice(tableIndex, 1);
+                    
+                    if (app.currentTableId === id) {
+                        app.currentTableId = null;
+                        if (app.tables.length > 0) {
+                            selectTable(app.tables[0].id);
+                        } else {
+                            showEmptyState();
+                        }
+                    }
+                    
+                    saveToLocalStorage();
+                    renderTableList();
+                    closeModal('deleteModal');
+                    showToast('success', `Tabel QA "${tableName}" berhasil dihapus`);
+                }
+            } else if (type === 'row') {
+                const table = app.tables.find(t => t.id === app.currentTableId);
+                if (table) {
+                    const rowIndex = table.rows.findIndex(r => r.id === id);
+                    if (rowIndex !== -1) {
+                        table.rows.splice(rowIndex, 1);
+                        saveToLocalStorage();
+                        renderTableView(table);
+                        closeModal('deleteModal');
+                        showToast('success', 'Data berhasil dihapus');
+                    }
+                }
+            }
+            
+            app.deleteTarget = null;
+        }
+
+        function openEditTableModal() {
+            const table = app.tables.find(t => t.id === app.currentTableId);
+            if (!table) return;
+            
+            document.getElementById('editTableName').value = table.name;
+            document.getElementById('editTableDescription').value = table.description || '';
+            openModal('editTableModal');
+        }
+
+        // Modal Management
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            
+            if (modalId === 'newTableModal') {
+                // Initialize with blank template
+                selectTemplate('blank');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Theme Management
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        function checkTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Toast Notifications
+        function showToast(type, message) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            }[type] || 'fa-info-circle';
+            
+            toast.innerHTML = `
+                <i class="fas ${icon} toast-icon"></i>
+                <span class="toast-message">${message}</span>
+            `;
+            
+            elements.toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (elements.toastContainer.contains(toast)) {
+                        elements.toastContainer.removeChild(toast);
+                    }
+                }, 200);
+            }, 3000);
+        }
+
+        // Empty State
+        function showEmptyState() {
+            elements.contentTitle.textContent = 'QA Dashboard';
+            elements.contentActions.style.display = 'none';
+            
+            elements.tableContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h2 class="empty-state-title">Tidak Ada Tabel QA</h2>
+                    <p class="empty-state-text">Buat tabel QA baru untuk memulai proses testing</p>
+                    <button class="btn btn-primary" onclick="openModal('newTableModal')">
+                        <i class="fas fa-plus"></i> Buat Tabel QA
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderTableList() {
+            elements.tableList.innerHTML = '';
+            
+            if (app.tables.length === 0) {
+                elements.tableList.innerHTML = '<li style="padding: var(--space-3); text-align: center; color: var(--gray-400);">Belum ada tabel QA</li>';
+                return;
+            }
+            
+            app.tables.forEach(table => {
+                const li = document.createElement('li');
+                li.className = 'table-item';
+                li.setAttribute('data-table-id', table.id);
+                
+                if (table.id === app.currentTableId) {
+                    li.classList.add('active');
+                }
+                
+                li.innerHTML = `
+                    <span>${table.name}</span>
+                    <span class="table-badge">${table.rows.length}</span>
+                `;
+                
+                li.addEventListener('click', () => selectTable(table.id));
+                elements.tableList.appendChild(li);
+            });
+        }
+
+        // Validation Functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validateUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        // Helper Functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Local Storage
+        function saveToLocalStorage() {
+            localStorage.setItem('qaTables', JSON.stringify(app.tables));
+        }
+
+        function loadFromLocalStorage() {
+            const tablesData = localStorage.getItem('qaTables');
+            if (tablesData) {
+                try {
+                    app.tables = JSON.parse(tablesData);
+                } catch (e) {
+                    console.error('Failed to parse tables data:', e);
+                    app.tables = [];
+                }
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
