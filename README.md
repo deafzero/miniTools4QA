@@ -2,6 +2,8 @@
 
 Aplikasi web dashboard untuk manajemen tabel data dengan fitur CRUD (Create, Read, Update, Delete) yang lengkap, dirancang khusus untuk Software Quality Assurance (QA) dengan tampilan modern dan user-friendly.
 
+u can acces at [https://11d3f4ca.minitool4qa.pages.dev/](https://11d3f4ca.minitool4qa.pages.dev/)
+
 ## ✨ Fitur Utama
 
 ### 📊 **Manajemen Tabel**
@@ -52,9 +54,3 @@ Aplikasi web dashboard untuk manajemen tabel data dengan fitur CRUD (Create, Rea
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - Tidak memerlukan instalasi tambahan
 - Tidak memerlukan backend atau database
-
-## 🚀 Cara Instalasi
-
-1. **Clone repository**
-   ```bash
-   git clone https://github.com/username/qa-dashboard-crud.git
